@@ -21,11 +21,12 @@ CREATE TABLE Participating_countries(
 CREATE TABLE Spectator(
   id_type varchar(22),
   country varchar(45),
-  o_state char(10),--i note you've used o_state where state not available -> need to update diagrams -jl
+  o_state char(10),
   doc_id integer(15),
   address varchar(100),
   full_name varchar(70),
-  PRIMARY KEY (id_type, country, o_state, doc_id));
+  PRIMARY KEY (id_type, country, o_state, doc_id)
+  );
 
 CREATE TABLE Event (
   event_name varchar (20),
@@ -50,7 +51,7 @@ CREATE TABLE Venue (
 );
 
 CREATE TABLE Seat (
-  seat_code VARCHAR(6), --changed name -> seat_code, increase to 6char -jl
+  seat_code INTEGER(6), --changed name -> seat_code, increase to 6char -jl --changed to integer type -jl
   venue_name VARCHAR(20) NOT NULL,--added not null -jl
   aisle VARCHAR(2),--perhaps we could pull a seating chart from somewhere so we are clear on the suitable inputs to this table -jl
   gate CHAR,
@@ -62,8 +63,8 @@ CREATE TABLE Seat (
 CREATE TABLE Ticket (
   barcode INTEGER,
   --changed name to seat_code, and 6 char as now including row number in this attribute -jl
-  seat_code VARCHAR(6),
-  status VARCHAR(6) NOT NULL, -- added by BS
+  seat_code INTEGER(6),
+  status VARCHAR(10) NOT NULL, -- added by BS
   seat_class VARCHAR(20),
   event_name VARCHAR(20),
   --name round not available --> round_no -jl
@@ -76,12 +77,7 @@ CREATE TABLE Ticket (
   --removed venue_name reference to venue table as it is already part of the key in seat table -jl
 );
 
-CREATE TABLE Ticket_status (
-  barcode integer NOT NULL,
-  status varchar(20),--added comma -jl
-  PRIMARY KEY (barcode, status),--added this PK due to the forced participation of each ticket having a status.
-  FOREIGN KEY (barcode) REFERENCES Ticket (barcode)
-);
+--removed ticket status table
 
 CREATE TABLE Transactions (--changed name to Transactions as Transaction not available -jl
   transaction_number integer(20) NOT NULL, --bs added unique to make tickets_sold work
