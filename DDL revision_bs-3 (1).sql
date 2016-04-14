@@ -4,7 +4,7 @@
 -- Final edit by Jason Lockie
 -- Edit By Ronak Patel
 -- Written by Brett Samuel
--- Version 1
+-- Version 4
 
 
 -----------------------------------------------------------
@@ -13,7 +13,7 @@ clear screen;
 
 
 CREATE TABLE Participating_countries (
-  iso varchar (3),--I thought this was a two character code ? -jl
+  iso varchar (2),--I thought this was a two character code ? -jl -- fixed BS
   country_name varchar(20),--name spelling error -> country_name -jl
   PRIMARY KEY (iso)
 );
@@ -22,7 +22,7 @@ CREATE TABLE Spectator (
   id_type varchar(20),
   country varchar(45),
   o_state varchar(20),--i note you've used o_state where state not available -> need to update diagrams -jl
-  doc_id varchar(15),
+  doc_id integer(15),
   address varchar(100),
   full_name varchar(70),
   PRIMARY KEY (id_type, country, o_state, doc_id)
@@ -33,9 +33,8 @@ CREATE TABLE Event (
   round_no varchar(20),
   --3 char not enough ->20, i.e "AU, BR, US" are all competing in the event -jl
   participating_countries varchar(20),
-  date_and_time varchar(20),
+  date_and_time datetime, --see: https://docs.oracle.com/cd/E17952_01/refman-5.5-en/datetime.html
   --note I renamed "date	+	time" date_and_time
-  --todo: find out if there is a date/time stamp in oracle SQL
   sport varchar(20),
   PRIMARY KEY (event_name, round_no),--added comma -jl
   FOREIGN KEY (participating_countries) REFERENCES Participating_countries (iso)--remove comma -jl
@@ -65,6 +64,7 @@ CREATE TABLE Ticket (
   barcode INTEGER,
   --changed name to seat_code, and 6 char as now including row number in this attribute -jl
   seat_code VARCHAR(6),
+  status VARCHAR(6) NOT NULL, -- added by BS
   seat_class VARCHAR(20),
   event_name VARCHAR(20),
   --name round not available --> round_no -jl
@@ -78,7 +78,7 @@ CREATE TABLE Ticket (
 );
 
 CREATE TABLE Ticket_status (
-  barcode integer,
+  barcode integer NOT NULL,
   status varchar(20),--added comma -jl
   PRIMARY KEY (barcode, status),--added this PK due to the forced participation of each ticket having a status.
   FOREIGN KEY (barcode) REFERENCES Ticket (barcode)
@@ -86,24 +86,23 @@ CREATE TABLE Ticket_status (
 
 CREATE TABLE Transactions (--changed name to Transactions as Transaction not available -jl
   transaction_number varchar(20) unique NOT NULL, --bs added unique to make tickets_sold work
+  price 
   id_type varchar(20),
   country varchar(45),
   o_state varchar(20),
-  doc_id varchar(15),
+  doc_id varchar(15
   --address varchar(100), --why is this here?? -jl
   --full_name varchar(70), --why is this here?? -jl
-  --PK removed: more than one spectator posible per transaction if buying multiple tickets -jl
+  --PK removed: more than one spectator possible per transaction if buying multiple tickets -jl
   --main constraint is that the spectator exists before transactions are generated (weak entity transaction discriminated by spectator) -jl
   --*fingers crossed* -jl
   --PRIMARY KEY (transaction_number)
-  FOREIGN KEY (id_type, country, o_state, doc_id) REFERENCES Spectator (id_type, country, o_state, doc_id)--removed comma -jl
+  --Commented by BS after tutor feedback FOREIGN KEY (id_type, country, o_state, doc_id) REFERENCES Spectator (id_type, country, o_state, doc_id)--removed comma -jl
 );
 
 CREATE TABLE Tickets_sold(
   transaction_number varchar(20),
   barcode INTEGER NOT NULL,--added not null -jl
-  
   FOREIGN KEY (transaction_number) REFERENCES Transactions (transaction_number),--added comma -jl
   FOREIGN KEY (barcode) REFERENCES Ticket (barcode)
 );
-
